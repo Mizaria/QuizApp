@@ -1,119 +1,186 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ToastAndroid, ScrollView, Image, Button, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ToastAndroid, ScrollView, Image, StyleSheet } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 
-const InputBox = ({ label, onChangeText, icon_name }) => {
-    return (
-        <View style={{ marginBottom: 20 }}>
-            <Text>{label}</Text>
-            <TextInput style={{ borderWidth: 1, padding: 8 }} onChangeText={onChangeText} />
-            {icon_name && <Icon name={icon_name} size={30} color="#0c3dc4" />}
-        </View>
-    );
-};
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: 'black',
+        paddingTop: 30,
+        paddingHorizontal: 20,
+    },
+    top: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+        justifyContent: 'center',
+    },
+    title: {
+        fontSize: 26,
+        fontWeight: 'bold',
+        color: 'white',
+        textAlign: 'center',
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    userContainer: {
+        marginBottom: 20,
+    },
+    usertext: {
+        color: 'cyan',
+        fontSize: 16,
+        marginBottom: 5,
+    },
+    username: {
+        borderWidth: 1,
+        borderColor: 'cyan',
+        padding: 10,
+        borderRadius: 8,
+        backgroundColor: 'white',
+    },
+    button: {
+        alignSelf: 'flex-start',
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        backgroundColor: 'cyan',
+        borderRadius: 5,
+        marginTop: 10,
+        marginBottom: 30,
+    },
+    buttonText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: 'black',
+    },
+    questionText: {
+        fontSize: 18,
+        color: 'cyan',
+        marginVertical: 10,
+    },
+    image: {
+        width: '100%',
+        height: 300,
+        marginTop: 20,
+        marginBottom: 20,
+        borderRadius: 10,
+    },
+    questionContainer: {
+        backgroundColor: '#282846',
+        padding: 15,
+        borderRadius: 10,
+        marginVertical: 10,
+    },
+});
+
+const questions = [
+    {
+        image: require('./img/bee.jpg'),
+        options: [
+            { label: 'Bee', value: 'Bee' },
+            { label: 'Fly', value: 'Fly' },
+            { label: 'Spider', value: 'Spider' },
+        ],
+        correctAnswer: 'Bee',
+    },
+    {
+        image: require('./img/elephant.jpg'),
+        options: [
+            { label: 'Elephant', value: 'Elephant' },
+            { label: 'Lion', value: 'Lion' },
+            { label: 'Cow', value: 'Cow' },
+        ],
+        correctAnswer: 'Elephant',
+    },
+    {
+        image: require('./img/tiger.jpg'),
+        options: [
+            { label: 'Mammal', value: 'Mammal' },
+            { label: 'Reptile', value: 'Reptile' },
+            { label: 'Bird', value: 'Bird' },
+        ],
+        correctAnswer: 'Mammal',
+    },
+];
 
 const MyApp = () => {
     const [name, setName] = useState('');
-    const [insectType, setInsectType] = useState('');
-    const [animalType, setAnimalType] = useState('');
-    const [anitype, setAnitype] = useState('');
+    const [answers, setAnswers] = useState(Array(questions.length).fill(null));
 
-    const handleInsectSelect = (value) => {
-        setInsectType(value);
-        let message = value === 'Bee'
+    const handleAnswerChange = (value, index) => {
+        const updatedAnswers = [...answers];
+        updatedAnswers[index] = value;
+        setAnswers(updatedAnswers);
+
+        const isCorrect = questions[index].correctAnswer === value;
+        const message = isCorrect
             ? `Congrats ${name}, you got it right!`
-            : value === 'Fly'
-                ? 'RIP, fly is not the right answer. Try again!'
-                : 'Not Even Close, Try again!';
-
+            : 'Not Even Close, Try again!';
         ToastAndroid.show(message, ToastAndroid.SHORT);
     };
 
-    const handleAnimalSelect = (value) => {
-        setAnimalType(value);
-        let message = value === 'Elephant'
-            ? `Congrats ${name}, you got it right!`
-            : value === 'Lion'
-                ? 'RIP, lion is not the right answer. Try again!'
-                : 'Not Even Close, Try again!';
-
-        ToastAndroid.show(message, ToastAndroid.SHORT);
+    const handleFinalSubmit = () => {
+        const correctCount = answers.filter(
+            (answer, index) => answer === questions[index].correctAnswer
+        ).length;
+        ToastAndroid.show(`You got ${correctCount} out of ${questions.length} correct!`, ToastAndroid.LONG);
     };
 
     return (
-        <ScrollView style={{ padding: 20, paddingTop: 50 }}>
-            <View style={{ flex: 1, minHeight: '100%', paddingBottom: 50 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-                    <Icon name="paw" size={30} color="#3894c9" style={{ marginRight: 10 }} />
-                    <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#3894c9' }}>ANIMAL QUIZ</Text>
-                    <Icon name="paw" size={30} color="#3894c9" style={{ marginLeft: 10 }} />
-                </View>
-
-                <InputBox label="Username:" onChangeText={(text) => setName(text)} />
-
-                <TouchableOpacity onPress={() => ToastAndroid.show(`Welcome ${name}`, ToastAndroid.SHORT)}>
-                    <Text>{name}</Text>
-                    <Text style={{
-                        fontSize: 20, fontWeight: 'bold', borderWidth: 1, borderBottomWidth: 10,
-                        alignSelf: 'flex-start', paddingHorizontal: 10, backgroundColor: '#00FFFF'
-                    }}>
-                        Enter
-                    </Text>
-                </TouchableOpacity>
-
-                <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#3854c9' }}>Welcome to the Animal Quiz!</Text>
-
-                <Text style={{ fontSize: 16, marginTop: 20 }}>Q1-What Insect Is This?</Text>
-                <RNPickerSelect
-                    onValueChange={handleInsectSelect}
-                    items={[
-                        { label: 'Bee', value: 'Bee' },
-                        { label: 'Fly', value: 'Fly' },
-                        { label: 'Spider', value: 'Spider' },
-                    ]}
-                />
-
-                <Image source={require('./img/bee.jpg')} style={{ width: 420, height: 500, marginTop: 20 }} />
-
-                <Text style={{ fontSize: 16, marginTop: 20 }}>Q2-What Animal Is This?</Text>
-                <RNPickerSelect
-                    onValueChange={handleAnimalSelect}
-                    items={[
-                        { label: 'Elephant', value: 'Elephant' },
-                        { label: 'Lion', value: 'Lion' },
-                        { label: 'Cow', value: 'Cow' },
-                    ]}
-                />
-
-                <Image source={require('./img/elephant.jpg')} style={{ width: 420, height: 500, marginTop: 20 }} />
-
-                <InputBox label="What type of animal is this?" onChangeText={(text) => setAnitype(text)} />
-
-                <TouchableOpacity onPress={() => {
-                    const correctAnswer = 'Mammal';
-                    const message = anitype === correctAnswer
-                        ? `Congrats ${name}, you got it right! It's a mammal!`
-                        : 'Wrong, try again!';
-
-                    ToastAndroid.show(message, ToastAndroid.SHORT);
-                }}>
-                    <Text style={{
-                        fontSize: 20, fontWeight: 'bold', borderWidth: 1,
-                        alignSelf: 'flex-start', paddingHorizontal: 10, backgroundColor: '#00FFFF'
-                    }}>
-                        Submit
-                    </Text>
-                </TouchableOpacity>
-
-                <Image source={require('./img/tiger.jpg')} style={{ width: 420, height: 500 }} />
-
+        <ScrollView style={styles.container}>
+            <View style={styles.top}>
+                <Icon name="paw" size={30} color="cyan" style={{ marginRight: 10 }} />
+                <Text style={styles.title}>ANIMAL QUIZ</Text>
+                <Icon name="paw" size={30} color="cyan" style={{ marginLeft: 10 }} />
             </View>
+
+
+            <View style={styles.userContainer}>
+                <Text style={styles.usertext}>Username:</Text>
+                <TextInput
+                    style={styles.username}
+                    onChangeText={(text) => setName(text)}
+                    value={name}
+                />
+            </View>
+
+
+            <TouchableOpacity
+                onPress={() => ToastAndroid.show(`Welcome ${name}`, ToastAndroid.SHORT)}
+                style={styles.button}
+            >
+                <Text style={styles.buttonText}>Enter</Text>
+            </TouchableOpacity>
+
+
+            <Text style={styles.questionText}>Welcome to the Animal Quiz!</Text>
+
+            {questions.map((question, index) => (
+                <View key={index} style={styles.questionContainer}>
+                    <Image source={question.image} style={styles.image} />
+                    <Text style={styles.questionText}>What animal is this?</Text>
+                    <RNPickerSelect
+                        onValueChange={(value) => handleAnswerChange(value, index)}
+                        items={question.options}
+                        value={answers[index]}
+                        style={{ inputIOS: { color: 'white' }, inputAndroid: { color: 'white' } }}
+                    />
+                </View>
+            ))}
+
+
+            <TouchableOpacity style={styles.button} onPress={handleFinalSubmit}>
+                <Text style={styles.buttonText}>Final Submit</Text>
+            </TouchableOpacity>
         </ScrollView>
     );
 };
 
 export default MyApp;
+
+
+
+
 
 
 
